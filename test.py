@@ -122,9 +122,10 @@ def run():
     # test_labels = load_test_labels()
 
     for i in range(10):
-        print (train_labels[i])
-        #plt.imshow(train_images[i], cmap='gray')
-        #plt.show()
+        print(train_labels[i])
+        print(train_images.shape)
+        plt.imshow(train_images[:,i].reshape(28,28), cmap='gray')
+        plt.show()
     print ('done')
 
 if __name__ == '__main__':
