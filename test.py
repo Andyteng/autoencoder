@@ -2,10 +2,13 @@ import numpy as np
 import struct
 import matplotlib.pyplot as plt
 
-train_images_idx3_ubyte_file = '/Users/Andyteng/Graduated_project/autoencoder/train-images-idx3-ubyte'
-train_labels_idx1_ubyte_file = '/Users/Andyteng/Graduated_project/autoencoder/train-labels-idx1-ubyte'
-test_images_idx3_ubyte_file = '/Users/Andyteng/Graduated_project/autoencoder/t10k-images-idx3-ubyte'
-test_labels_idx1_ubyte_file = '/Users/Andyteng/Graduated_project/autoencoder/t10k-labels-idx1-ubyte'
+from keras.layers import Input, Dense
+from keras.models import Model
+
+train_images_idx3_ubyte_file = '/Users/Andyteng/Graduated_project/autoencoder/MNIST/train-images-idx3-ubyte'
+train_labels_idx1_ubyte_file = '/Users/Andyteng/Graduated_project/autoencoder/MNIST/train-labels-idx1-ubyte'
+test_images_idx3_ubyte_file = '/Users/Andyteng/Graduated_project/autoencoder/MNIST/t10k-images-idx3-ubyte'
+test_labels_idx1_ubyte_file = '/Users/Andyteng/Graduated_project/autoencoder/MNIST/t10k-labels-idx1-ubyte'
 
 
 def decode_idx3_ubyte(idx3_ubyte_file):
@@ -120,12 +123,24 @@ def run():
     train_labels = load_train_labels()
     # test_images = load_test_images()
     # test_labels = load_test_labels()
+    #this is the size of our encoded represenations
+    encoding_dim = 32 # 32 floats -> compression of factor 24.5, assuming the input is 784 floats(28*28)
+
+    #this is our input placeholder
+    input_img = Input(shape=(784,))
+    # "encoded" is the encoded representation of the input
+    encoded = Dense(encoding_dim, activation='relu')(input_img)
+    # "decoded" is the lossy reconstruction of the input
+    decoded = Dense(784, activation = 'sigmoid')(encoded)
+
+    # this model maps an input to its reconstruction
+    autoencoder = Model(input_img, decoded)
 
     for i in range(10):
         print(train_labels[i])
         print(train_images.shape)
-        plt.imshow(train_images[:,i].reshape(28,28), cmap='gray')
-        plt.show()
+        #plt.imshow(train_images[:,i].reshape(28,28), cmap='gray')
+        #plt.show()
     print ('done')
 
 if __name__ == '__main__':
