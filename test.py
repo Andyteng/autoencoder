@@ -25,7 +25,7 @@ def decode_idx3_ubyte(idx3_ubyte_file):
     images = np.empty((num_images, num_rows*num_cols))
     for i in range(num_images):
         if (i + 1) % 10000 == 0:
-            print ('already %d' % (i + 1) + 'pictures')
+            print ('already %d' % (i + 1) + ' pictures')
         images[i] = np.array(struct.unpack_from(fmt_image, bin_data, offset)).reshape((num_rows*num_cols))
         offset += struct.calcsize(fmt_image)
     return images.T
@@ -123,9 +123,16 @@ def run():
     train_labels = load_train_labels()
     # test_images = load_test_images()
     # test_labels = load_test_labels()
+    
     #this is the size of our encoded represenations
     encoding_dim = 32 # 32 floats -> compression of factor 24.5, assuming the input is 784 floats(28*28)
 
+    #for i in range(10):
+        #print(train_labels[i])
+        #print(train_images.shape)
+        #plt.imshow(train_images[:,i].reshape(28,28), cmap='gray')
+        #plt.show()
+        
     #this is our input placeholder
     input_img = Input(shape=(784,))
     # "encoded" is the encoded representation of the input
@@ -136,11 +143,16 @@ def run():
     # this model maps an input to its reconstruction
     autoencoder = Model(input_img, decoded)
 
-    for i in range(10):
-        print(train_labels[i])
-        print(train_images.shape)
-        #plt.imshow(train_images[:,i].reshape(28,28), cmap='gray')
-        #plt.show()
+    encoder = Model(input_img, encoded)
+    #create a placeholder for an encoded (32-dimentional) input
+    encoded_input = Input(shape=(encoding_dim,))
+    #retrive the last layer of the antoencoder model
+    decoder_layer = antocoder.layers[-1]
+    #create the decoder model
+    decoder = Model(encoded_input, decoder_layer(encoded_input))
+    #configure our model to use a pixel binary crossentropy loss, and the Adadelta optimizer
+    autoencoder.compile(optimizer='adadelta', loss ='binary_crossentropy')
+
     print ('done')
 
 if __name__ == '__main__':
